@@ -38,13 +38,11 @@ async function start() {
     });
 
     app.get("/users/:searchName", async (req, res) => {
-      console.log(req.params.searchName);
       try {
         let checklen = req.params.searchName.length;
-        console.log(checklen);
         if (checklen >= 3) {
           let users = await user.find({
-            firstName: { $regex: "^" + req.params.searchName + ".*" }
+            firstName: { $regex: "^" + req.params.searchName + ".*" , '$options' : 'i'}
           });
           res.send(users);
         } else {

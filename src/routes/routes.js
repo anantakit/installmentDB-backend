@@ -6,9 +6,11 @@ const user = require("../db/user");
 const financialInfo = require("../db/financialInfo");
 const transactions = require("../db/transactions");
 
-async function start() {
+async function start(
+  name = "mongodb://103.74.254.244:27017/oddsInstallmentDB"
+) {
   try {
-    await mongoose.connect("mongodb://103.74.254.244:27017/oddsInstallmentDB", {
+    await mongoose.connect(name, {
       useNewUrlParser: true,
       useCreateIndex: true,
       useUnifiedTopology: true,
@@ -19,7 +21,7 @@ async function start() {
 
     app.get("/", (req, res) => res.send({ mesaage: "hq" }));
 
-    app.get("/finacials", async (req, res) => {
+    app.get("/financials", async (req, res) => {
       try {
         let finacials = await financialInfo.find({});
         res.send(finacials);
@@ -37,12 +39,15 @@ async function start() {
       }
     });
 
-    app.get("/users/:searchName", async (req, res) => {
+    app.get("/users/search", async (req, res) => {
       try {
-        let checklen = req.params.searchName.length;
+        let checklen = req.query.name.length;
         if (checklen >= 3) {
           let users = await user.find({
-            firstName: { $regex: "^" + req.params.searchName + ".*" , '$options' : 'i'}
+            firstName: {
+              $regex: "^" + req.query.name + ".*",
+              $options: "i"
+            }
           });
           res.send(users);
         } else {
@@ -50,6 +55,18 @@ async function start() {
         }
       } catch (error) {
         res.status(500).send();
+      }
+    });
+
+    app.post("/users", async (req, res) => {
+      try {
+        const newUserModel = new user({
+          ...req.body
+        });
+        await newUserModel.save();
+        res.status(201).end();
+      } catch (error) {
+        res.status(400).json(error);
       }
     });
 

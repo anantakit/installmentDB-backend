@@ -3,9 +3,13 @@ const mongoose = require("mongoose");
 const { app, start } = require("../src/routes/routes");
 
 beforeEach(async () => {
-  await start();
+  await start("mongodb://103.74.254.244:27017/testoddsInstallmentDB");
 });
 afterEach(async () => {
+  const collections = await mongoose.connection.db.collections();
+  for (let collection of collections) {
+    await collection.remove();
+  }
   await mongoose.connection.close();
 });
 
@@ -17,7 +21,7 @@ test("test get user route", async () => {
 });
 
 test("test get finacials route", async () => {
-  const response = await supertest(app).get("/finacials");
+  const response = await supertest(app).get("/financials");
 
   expect(response.status).toEqual(200);
   //expect(response.body.length).toEqual(1);
@@ -31,7 +35,16 @@ test("test get transactions route", async () => {
 });
 
 test("test search by firstName", async () => {
-  const response = await supertest(app).get("/users/ang");
+  await supertest(app)
+    .post("/users")
+    .send({
+      firstName: "Angkana",
+      lastName: "Luprasit",
+      nickName: "Hmoo",
+      email: "pirom@gmail.com",
+      phone: "0931235533"
+    });
+  const response = await supertest(app).get("/users/search?name=ang");
 
   expect(response.status).toEqual(200);
   expect(response.body[0].firstName).toEqual("Angkana");

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const TransactionsSchema = new Schema({
-  uid: String,
+  uid: Schema.Types.ObjectId,
   amount: Number,
   date: Date,
   evidence: String,

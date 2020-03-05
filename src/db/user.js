@@ -5,11 +5,23 @@ const UserSchema = new Schema({
   firstName: String,
   lastName: String,
   nickName: String,
-  email: String,
+  email: {
+    type: String,
+    unique: true
+  },
   phone: String,
-  totalLoan: Number,
-  paidAmount: Number,
-  remainingAmount: Number
+  totalLoan: {
+    type: Number,
+    default: 0
+  },
+  paidAmount: {
+    type: Number,
+    default: 0
+  },
+  remainingAmount: {
+    type: Number,
+    default: 0
+  }
 });
 
 module.exports = mongoose.model("user", UserSchema);
